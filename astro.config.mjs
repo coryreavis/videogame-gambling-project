@@ -3,6 +3,6 @@ import react from '@astrojs/react';
 
 export default defineConfig({
   integrations: [react()],
-  base: '/videogame-gambling-project/',
+  base: '/videogame-gambling-project',
   output: 'static',
 });
