@@ -1,0 +1,109 @@
+---
+// Nav.astro — Fixed side navigation showing chapter progress
+---
+
+<nav class="chapter-nav" aria-label="Chapter navigation">
+  <div class="nav-items">
+    {[
+      { id: "chapter-1", label: "The Beginning" },
+      { id: "chapter-2", label: "The Hook" },
+      { id: "chapter-3", label: "The Blur" },
+      { id: "chapter-4", label: "The Research" },
+      { id: "chapter-5", label: "The Reflection" },
+    ].map((ch, i) => (
+      <a
+        href={`#${ch.id}`}
+        class="nav-item"
+        data-chapter={ch.id}
+        aria-label={`Chapter ${i + 1}: ${ch.label}`}
+      >
+        <span class="nav-dot" aria-hidden="true"></span>
+        <span class="nav-label">{ch.label}</span>
+      </a>
+    ))}
+  </div>
+</nav>
+
+<script>
+  // Highlight active chapter dot as user scrolls
+  const items = document.querySelectorAll('.nav-item');
+  const chapters = document.querySelectorAll('section[id^="chapter"]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        items.forEach(item => item.classList.remove('active'));
+        const active = document.querySelector(`[data-chapter="${entry.target.id}"]`);
+        active?.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+
+  chapters.forEach(ch => observer.observe(ch));
+</script>
+
+<style>
+  .chapter-nav {
+    position: fixed;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nav-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .nav-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: transparent;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+
+  .nav-item.active .nav-dot {
+    background: white;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    transform: scale(1.4);
+  }
+
+  .nav-item:hover .nav-label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .nav-item.active .nav-label {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  @media (max-width: 600px) {
+    .chapter-nav { display: none; }
+  }
+</style>

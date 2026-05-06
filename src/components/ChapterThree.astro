@@ -1,0 +1,135 @@
+---
+// ChapterThree.astro
+// The Blur: design goes full casino neon. Roulette wheel + popup ad live here.
+import RouletteWheel from './RouletteWheel.jsx';
+import PopupAd from './PopupAd.jsx';
+---
+
+<section class="chapter-three" id="chapter-3">
+  <!-- Popup fires from this chapter context -->
+  <PopupAd client:visible />
+
+  <div class="neon-grid" aria-hidden="true"></div>
+
+  <div class="content">
+    <div class="chapter-label pixel-text">// CHAPTER 03</div>
+
+    <h2 class="chapter-title">
+      <span class="red-flash">THE BLUR:</span><br />
+      WHEN GAMING BECOMES GAMBLING
+    </h2>
+
+    <div class="essay-text">
+      <p>
+        <!-- TODO: Replace with your own content -->
+        The line was never drawn clearly. Fortnite's V-Bucks. FIFA's Ultimate
+        Team packs. Counter-Strike's weapon cases. Each mechanic, when examined
+        in isolation, could be defended. Together, they formed a pipeline.
+      </p>
+      <p>
+        <!-- TODO: Add research on industry self-regulation failure -->
+        Regulators struggled to keep up. The industry called them "surprise
+        mechanics." Parents called them what they were.
+      </p>
+    </div>
+
+    <div class="roulette-section">
+      <p class="roulette-label pixel-text">SPIN THE WHEEL</p>
+      <p class="roulette-sub">The house always wins. Try it yourself.</p>
+      <RouletteWheel client:visible />
+    </div>
+  </div>
+</section>
+
+<style>
+  .chapter-three {
+    min-height: 100vh;
+    background-color: var(--c3-bg);
+    color: var(--c3-text);
+    padding: var(--section-padding);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Neon grid background */
+  .neon-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 0, 60, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 0, 60, 0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .chapter-three::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, #0d0d0d 100%);
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+  }
+
+  .chapter-label {
+    font-size: 0.6rem;
+    color: var(--c3-accent);
+    letter-spacing: 0.2em;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+
+  .chapter-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 2.5rem;
+    color: var(--c3-text);
+  }
+
+  .red-flash {
+    color: var(--c3-accent);
+    text-shadow: 0 0 20px var(--c3-accent), 0 0 40px rgba(255, 0, 60, 0.4);
+    animation: flicker 3s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96%            { opacity: 0.3; }
+    98%            { opacity: 0.8; }
+  }
+
+  .essay-text p {
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    line-height: 1.9;
+    margin-bottom: 1.5rem;
+    color: rgba(240, 240, 240, 0.85);
+  }
+
+  .roulette-section {
+    margin-top: 3rem;
+    text-align: center;
+  }
+
+  .roulette-label {
+    font-size: 0.7rem;
+    color: var(--c3-neon-gold);
+    letter-spacing: 0.2em;
+    margin-bottom: 0.5rem;
+  }
+
+  .roulette-sub {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-mono);
+  }
+</style>

@@ -1,0 +1,137 @@
+---
+// ChapterFive.astro
+// The Reflection: somber, minimal close. Your conclusion lives here.
+---
+
+<section class="chapter-five" id="chapter-5">
+  <div class="content">
+    <div class="chapter-label pixel-text">// CHAPTER 05</div>
+    <h2 class="chapter-title">THE REFLECTION</h2>
+
+    <div class="counter-block" aria-live="polite">
+      <span class="counter-num" id="counter">0</span>
+      <p class="counter-label">
+        adolescents estimated to show problem gambling behavior linked to
+        video game mechanics in the U.S. alone
+        <!-- TODO: Replace counter target and source with your actual stat -->
+      </p>
+    </div>
+
+    <div class="conclusion">
+      <p>
+        <!-- TODO: Replace with your conclusion paragraph -->
+        The journey from a Christmas morning controller to a loot box habit
+        was not accidental. It was designed — tested, iterated, and optimized
+        by people who understood exactly what they were building.
+      </p>
+      <p>
+        <!-- TODO: Add your call to action / closing argument -->
+        Awareness is the first step. Regulation must follow. And the next
+        generation of young gamers deserves a childhood that doesn't come
+        pre-packaged with a gambling problem.
+      </p>
+    </div>
+
+    <div class="final-line pixel-text">GAME OVER?</div>
+  </div>
+</section>
+
+<script>
+  // Animated counter — triggers when section enters view
+  const counterEl = document.getElementById('counter');
+  // TODO: Replace 2600000 with your actual statistic
+  const TARGET = 2600000;
+  const DURATION = 3000;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && counterEl) {
+        let start = 0;
+        const step = TARGET / (DURATION / 16);
+        const interval = setInterval(() => {
+          start = Math.min(start + step, TARGET);
+          if (counterEl) counterEl.textContent = Math.floor(start).toLocaleString();
+          if (start >= TARGET) clearInterval(interval);
+        }, 16);
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const section = document.getElementById('chapter-5');
+  if (section) observer.observe(section);
+</script>
+
+<style>
+  .chapter-five {
+    min-height: 100vh;
+    background-color: var(--c5-bg);
+    color: var(--c5-text);
+    padding: var(--section-padding);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .content { max-width: 700px; text-align: center; }
+
+  .chapter-label {
+    font-size: 0.6rem;
+    color: var(--c5-accent);
+    letter-spacing: 0.2em;
+    margin-bottom: 1.5rem;
+    opacity: 0.6;
+  }
+
+  .chapter-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 800;
+    margin-bottom: 3rem;
+    color: var(--c5-text);
+    opacity: 0.9;
+  }
+
+  /* Counter */
+  .counter-block {
+    margin-bottom: 4rem;
+  }
+
+  .counter-num {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+  }
+
+  .counter-label {
+    font-size: 0.9rem;
+    color: var(--c5-accent);
+    line-height: 1.6;
+    max-width: 40ch;
+    margin: 0 auto;
+    font-family: var(--font-mono);
+  }
+
+  /* Conclusion */
+  .conclusion p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.9;
+    margin-bottom: 1.5rem;
+    color: rgba(200, 200, 200, 0.8);
+    text-align: left;
+  }
+
+  /* Final line */
+  .final-line {
+    margin-top: 5rem;
+    font-size: 1rem;
+    color: var(--c5-accent);
+    letter-spacing: 0.3em;
+    opacity: 0.5;
+    text-align: center;
+  }
+</style>

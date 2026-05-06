@@ -1,0 +1,23 @@
+---
+// index.astro — Main page, assembles all chapters in order
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import ChapterOne from '../components/ChapterOne.astro';
+import ChapterTwo from '../components/ChapterTwo.astro';
+import ChapterThree from '../components/ChapterThree.astro';
+import ChapterFour from '../components/ChapterFour.astro';
+import ChapterFive from '../components/ChapterFive.astro';
+---
+
+<BaseLayout>
+  <Nav />
+  <main>
+    <Hero />
+     <ChapterOne />
+    <ChapterTwo />
+    <ChapterThree />
+    <ChapterFour />
+    <ChapterFive />
+  </main>
+</BaseLayout>

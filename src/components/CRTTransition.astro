@@ -1,0 +1,242 @@
+---
+// CRTTransition.astro
+---
+
+<div class="crt-overlay" id="crt-overlay" aria-hidden="true">
+  <canvas id="crt-canvas"></canvas>
+</div>
+
+<script>
+  const overlay = document.getElementById('crt-overlay');
+  const canvas = document.getElementById('crt-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const CHAR_SIZE = 14;
+  const LINE_HEIGHT = 18;
+  const BINARY = ['0', '1'];
+  const BLOCKS = ['█', '▓', '▒', '░'];
+
+  let cols = 0, rows = 0;
+  let charGrid = [], blockGrid = [];
+  let progress = 0;      // 0 = clean hero, 1 = fully filled
+  let released = false;  // true once we've handed scroll back to the browser
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    cols = Math.ceil(canvas.width / CHAR_SIZE);
+    rows = Math.ceil(canvas.height / LINE_HEIGHT);
+    charGrid = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => BINARY[Math.random() > 0.5 ? 1 : 0])
+    );
+    blockGrid = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => {
+        const r = Math.random();
+        if (r < 0.5) return '█';
+        if (r < 0.75) return '▓';
+        if (r < 0.9) return '▒';
+        return '░';
+      })
+    );
+    draw(progress);
+  }
+
+  function draw(p) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = `${CHAR_SIZE}px 'Courier New', monospace`;
+
+    for (let row = 0; row < rows; row++) {
+      // Fill direction: bottom-up (row 0 = top, fills last)
+      const rowFromBottom = (rows - 1 - row) / rows;
+      const rowThreshold = rowFromBottom;
+      const rowProgress = Math.max(0, (p - rowThreshold * 0.6) / 0.4);
+      const localProgress = Math.min(1, rowProgress);
+      if (localProgress <= 0) continue;
+
+       // --- Change 4: white background fill behind this row ---
+      // Grows from fully transparent to fully white as localProgress → 1
+      const BG_LAG = 0.25;
+      const bgOpacity = Math.min(1, Math.max(0, (localProgress - BG_LAG) / (1 - BG_LAG)) * 1.2);
+      ctx.fillStyle = `rgba(255, 255, 255, ${bgOpacity})`;
+      ctx.fillRect(0, row * LINE_HEIGHT, canvas.width, LINE_HEIGHT);
+
+
+      const blockRatio = Math.min(1, localProgress * 1.5);
+      const charRatio = localProgress < 0.5
+        ? 0
+        : Math.min(1, (localProgress - 0.5) / 0.3);
+
+      for (let col = 0; col < cols; col++) {
+        if (Math.random() > localProgress * 1.2 && localProgress < 0.85) continue;
+        const useBlock = Math.random() < blockRatio;
+        const char = useBlock ? blockGrid[row][col] : charGrid[row][col];
+        const opacity = 0.3 + localProgress * 0.7;
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.fillText(char, col * CHAR_SIZE, row * LINE_HEIGHT + CHAR_SIZE);
+      }
+    }
+  }
+
+  function lock() {
+    released = false;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    overlay.style.display = '';
+    overlay.style.opacity = '1';
+    overlay.style.transition = '';
+  }
+
+  function releaseForward() {
+    released = true;
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+
+    // Don't snap anywhere — just unlock scroll.
+    // The overlay stays visible as a solid white cover
+    // so the dark hero is never seen during normal scrolling.
+    overlay.style.background = 'white';
+    overlay.style.transition = '';
+    overlay.style.opacity = '1';
+
+    // Once the user has scrolled far enough past the hero,
+    // quietly hide the overlay so it doesn't cover later chapters
+    function checkHide() {
+      const hero = document.getElementById('hero');
+      const heroBottom = hero.offsetTop + hero.offsetHeight;
+      if (window.scrollY > heroBottom) {
+        overlay.style.transition = 'opacity 0.3s ease';
+        overlay.style.opacity = '0';
+        setTimeout(() => { overlay.style.display = 'none'; }, 300);
+        window.removeEventListener('scroll', checkHide);
+      }
+    }
+    window.addEventListener('scroll', checkHide, { passive: true });
+  }
+
+  function releaseBackward() {
+    released = true;
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+
+    // Keep overlay white while the page scrolls back to the top
+    overlay.style.background = 'white';
+    overlay.style.transition = '';
+    overlay.style.opacity = '1';
+    overlay.style.display = '';
+
+    function checkReengage() {
+      const hero = document.getElementById('hero');
+      const heroBottom = hero.offsetTop + hero.offsetHeight;
+
+      if (window.scrollY < heroBottom) {
+        // Hero is back in view — snap to top, re-engage transition
+        window.removeEventListener('scroll', checkReengage);
+        window.scrollTo(0, 0);
+
+        // Reset canvas and hand control back
+        overlay.style.background = '';
+        progress = 1;
+        draw(progress);
+        lock();
+      }
+    }
+
+    window.addEventListener('scroll', checkReengage, { passive: true });
+  }
+
+  function advance(delta) {
+    // delta > 0 = scrolling down (fill), delta < 0 = scrolling up (drain)
+
+    if (released) {
+      // Re-engage if they scroll back up near the top of chapter-1
+      const ch1 = document.getElementById('chapter-1');
+      const scrollY = window.scrollY;
+      if (delta < 0 && scrollY <= (ch1?.offsetTop ?? 0) + 10) {
+        window.scrollTo(0, 0);
+        lock();
+        return;
+      }
+      return;
+    }
+
+    progress = Math.max(0, Math.min(1, progress + delta));
+    draw(progress);
+
+    if (progress >= 1) {
+      releaseForward();
+    } else if (progress <= 0) {
+      releaseBackward();
+    }
+  }
+
+  // ---- Intent listeners ----
+
+  window.addEventListener('wheel', (e) => {
+    if (released && e.deltaY > 0) return; // scrolling down past hero — leave alone
+    if (released && e.deltaY < 0) {
+      // Check if we're close enough to the top to re-engage
+      const ch1 = document.getElementById('chapter-1');
+      if (window.scrollY <= (ch1?.offsetTop ?? 0) + 10) {
+        e.preventDefault();
+        window.scrollTo(0, 0);
+        lock();
+        advance(-0.04);
+      }
+      return;
+    }
+    e.preventDefault();
+    const normalized = Math.min(Math.abs(e.deltaY) / 800, 0.06);
+    advance(e.deltaY > 0 ? normalized : -normalized);
+  }, { passive: false });
+
+  let touchStartY = 0;
+  window.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (e) => {
+    if (released) return;
+    e.preventDefault();
+    const delta = touchStartY - e.touches[0].clientY;
+    touchStartY = e.touches[0].clientY;
+    advance(delta / 300);
+  }, { passive: false });
+
+  window.addEventListener('keydown', (e) => {
+    if (released) return;
+    if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
+      e.preventDefault();
+      advance(0.08);
+    }
+    if (['ArrowUp', 'PageUp'].includes(e.key)) {
+      e.preventDefault();
+      advance(-0.08);
+    }
+  });
+
+  // ---- Init ----
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw(0);
+</script>
+<style>
+  .crt-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  #crt-canvas {
+    width: 100%;
+    height: 100%;
+  }
+</style>

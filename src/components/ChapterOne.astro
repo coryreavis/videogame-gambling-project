@@ -1,0 +1,174 @@
+---
+// ChapterOne.astro
+// The Beginning: warm, pixelated, innocent childhood gaming
+---
+
+<section class="chapter-one" id="chapter-1">
+  <div class="chapter-label pixel-text">// CHAPTER 01</div>
+
+  <div class="content">
+    <h2 class="chapter-title pixel-text">LEVEL 1:<br />JUST A KID</h2>
+
+    <div class="game-scene" aria-label="Pixel art game animation">
+      <!-- Simple CSS sprite animation of a running character -->
+      <div class="ground"></div>
+      <div class="clouds">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+      </div>
+      <div class="character" aria-hidden="true">▶</div>
+      <div class="platforms">
+        <div class="platform p1"></div>
+        <div class="platform p2"></div>
+        <div class="platform p3"></div>
+      </div>
+    </div>
+
+    <div class="essay-text">
+      <p>
+        <!-- TODO: Replace with your own intro paragraph -->
+        It started simply. A console under the Christmas tree, a cartridge,
+        a controller worn smooth at the thumbsticks. For millions of kids born
+        in the 2000s, video games were the defining hobby of childhood — social,
+        creative, and completely benign.
+      </p>
+      <p>
+        <!-- TODO: Add your context / personal anecdote here -->
+        I was one of them. My story is not unique. That's exactly the problem.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .chapter-one {
+    min-height: 100vh;
+    background-color: var(--c1-bg);
+    color: var(--c1-text);
+    padding: var(--section-padding);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle pixel-grid background */
+  .chapter-one::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(212, 163, 115, 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 163, 115, 0.15) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+
+  .chapter-label {
+    font-size: 0.6rem;
+    color: var(--c1-accent);
+    letter-spacing: 0.2em;
+    margin-bottom: 2rem;
+    opacity: 0.7;
+  }
+
+  .chapter-title {
+    font-size: clamp(1.2rem, 4vw, 2.5rem);
+    line-height: 1.8;
+    color: var(--c1-text);
+    margin-bottom: 3rem;
+  }
+
+  /* ---- Game Scene ---- */
+  .game-scene {
+    position: relative;
+    height: 180px;
+    background: linear-gradient(180deg, #87ceeb 0%, #c9e8f5 60%, #a8d8a8 60%);
+    border: 4px solid var(--c1-text);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+    image-rendering: pixelated;
+  }
+
+  .ground {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background: repeating-linear-gradient(
+      90deg,
+      #5a8a3c 0px, #5a8a3c 32px,
+      #4a7a2c 32px, #4a7a2c 64px
+    );
+  }
+
+  /* Clouds */
+  .cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50px;
+    top: 20px;
+    height: 20px;
+  }
+  .cloud::before {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    width: 60%;
+    height: 200%;
+    top: -50%;
+    left: 20%;
+  }
+  .cloud-1 { width: 80px; animation: drift 18s linear infinite; left: 100%; }
+  .cloud-2 { width: 60px; animation: drift 24s linear infinite 6s; left: 100%; top: 35px; }
+  .cloud-3 { width: 100px; animation: drift 20s linear infinite 12s; left: 100%; top: 10px; }
+
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-100vw - 200px)); }
+  }
+
+  /* Running character */
+  .character {
+    position: absolute;
+    bottom: 44px;
+    left: 15%;
+    font-size: 1.8rem;
+    animation: run 0.4s steps(1) infinite;
+    color: var(--c1-text);
+    font-family: var(--font-pixel);
+  }
+
+  @keyframes run {
+    0%  { transform: scaleX(1)   translateY(0); }
+    50% { transform: scaleX(1)   translateY(-2px); }
+  }
+
+  /* Platforms */
+  .platform {
+    position: absolute;
+    height: 12px;
+    background: #8B4513;
+    border-top: 4px solid #a0522d;
+    bottom: 40px;
+  }
+  .p1 { width: 80px;  left: 35%;  bottom: 80px; }
+  .p2 { width: 100px; left: 55%;  bottom: 100px; }
+  .p3 { width: 60px;  left: 75%;  bottom: 120px; }
+
+  /* Essay text */
+  .essay-text {
+    max-width: 65ch;
+  }
+
+  .essay-text p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+  }
+</style>
